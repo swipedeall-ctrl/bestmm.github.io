@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMM Service Panel</title>
+    <!-- Font Awesome Icons for social media logos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding-bottom: 80px; /* Footer space for chat button */
+        }
+
+        /* Header Styling */
+        .header {
+            background: linear-gradient(90deg, #d53369, #daae51);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Promo Banner Styling */
+        .promo-banner {
+            margin: 15px;
+            padding: 20px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+        .promo-banner h2 {
+            margin: 0 0 10px 0;
+        }
+        .promo-banner p {
+            margin: 0;
+        }
+
+        /* Service Category Styling */
+        .service-category {
+            margin: 20px 15px;
+        }
+        .category-title {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #333;
+            border-left: 4px solid #d53369;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .category-title .fab, .category-title .fas {
+            margin-right: 10px;
+            width: 25px;
+            text-align: center;
+        }
+        .category-content {
+            display: none;
+        }
+        .category-content.active {
+            display: block;
+        }
+
+        /* Service List Styling */
+        .service-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .service-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eeeeee;
+            background: #fff;
+        }
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        .service-details {
+            flex-grow: 1;
+            font-size: 16px;
+        }
+        .buy-button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .buy-button:hover {
+            background-color: #1a252f;
+        }
+
+        /* Icon Colors */
+        .fa-instagram { color: #E1306C; }
+        .fa-youtube { color: #FF0000; }
+        .fa-facebook { color: #1877F2; }
+        .fa-twitter { color: #1DA1F2; }
+        .fa-telegram { color: #2AABEE; }
+        .fa-spotify { color: #1DB954; }
+        .fa-tiktok { color: #000000; }
+        .fa-snapchat { color: #FFFC00; }
+        .fa-linkedin { color: #0077B5; }
+        .fa-pinterest { color: #BD081C; }
+        .fa-soundcloud { color: #FF7700; }
+        .fa-twitch { color: #9146FF; }
+        .fa-discord { color: #5865F2; }
+        .fa-reddit { color: #FF4500; }
+        .fa-whatsapp { color: #25D366; }
+
+        /* Section Toggle Animation */
+        .category-title i.fa-chevron-down {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+        .category-title.active i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        /* --- CHATBOT STYLES --- */
+        .chat-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #d53369, #daae51);
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+            z-index: 1000;
+        }
+        .chat-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            max-height: 450px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background: linear-gradient(90deg, #d53369, #daae51);
+            color: #fff;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-close {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 85%;
+            line-height: 1.4;
+        }
+
+        .bot {
+            background: #f1f1f1;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .user {
+            background: #e1ffc7;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .typing-indicator {
+            padding: 10px 15px;
+            font-style: italic;
+            color: #999;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: none;
+            padding: 15px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-input button {
+            border: none;
+            background: #daae51;
+            color: #fff;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .chat-input button:hover {
+            background: #d53369;
+        }
+
+        /* Buy Link Page Styling */
+        .buy-link-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .buy-link-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .buy-link-container h2 {
+            margin-top: 0;
+            color: #d53369;
+        }
+        .buy-link-container p {
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        .buy-link-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .buy-link-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .buy-link-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .copy-btn {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .close-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            AapkaBrand
+        </div>
+
+        <div class="promo-banner">
+            <h2>Best SMM Services</h2>
+            <p>Non Drop Active Followers & Subscribers</p>
+        </div>
+
+        <!-- Instagram Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-instagram"></i> Instagram Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content active">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">1,000 Followers [Basic]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-followers-basic')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">5,000 Followers [High Quality]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-followers-hq')">₹135 Buy</button></li>
+                    <li class="service-item"><span class="service-details">10,000 Followers [Premium]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-followers-premium')">₹250 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Indian Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-indian-followers')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,500 Post Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-likes')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">5,000 Reel Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-reel-likes')">₹89 Buy</button></li>
+                    <li class="service-item"><span class="service-details">20,000 Reel Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-reel-views')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">100,000 Reel Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-reel-views-100k')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">2,500 Story Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-story-views')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Post Saves</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-saves')">₹35 Buy</button></li>
+                    <li class="service-item"><span class="service-details">50 Custom Comments</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-comments')">₹45 Buy</button></li>
+                    <li class="service-item"><span class="service-details">100 Live Video Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-live-views')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Profile Blue Tick [GUIDE]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-verification')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Instagram Auto Likes (1 Month)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-auto-likes')">₹199 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Instagram Mentions (500 Users)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/instagram-mentions')">₹149 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- YouTube Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-youtube"></i> YouTube Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">500 Subscribers [NON-DROP]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-subscribers-500')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Subscribers [REAL]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-subscribers-1000')">₹95 Buy</button></li>
+                    <li class="service-item"><span class="service-details">2,000 Views [HIGH RETENTION]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-views-2000')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">10,000 Views [FAST]</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-views-10000')">₹250 Buy</button></li>
+                    <li class="service-item"><span class="service-details">50,000 Shorts Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-shorts-views')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-likes')">₹60 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Watch Hours</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-watch-hours')">₹45 Buy</button></li>
+                    <li class="service-item"><span class="service-details">4,000 Watch Hours Pack</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-watch-hours-4000')">₹150 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Monetization Pack (1k Subs + 4k Hours)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-monetization-pack')">₹240 Buy</button></li>
+                    <li class="service-item"><span class="service-details">100 Custom Comments</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-comments')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">YouTube Channel Audit</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-audit')">₹299 Buy</button></li>
+                    <li class="service-item"><span class="service-details">YouTube SEO Optimization</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/youtube-seo')">₹499 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Facebook Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-facebook"></i> Facebook Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">1,500 Page Likes/Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-page-likes')">₹45 Buy</button></li>
+                    <li class="service-item"><span class="service-details">5,000 Page Likes/Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-page-likes-5000')">₹140 Buy</button></li>
+                    <li class="service-item"><span class="service-details">2,000 Post Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-post-likes')">₹39 Buy</button></li>
+                    <li class="service-item"><span class="service-details">20,000 Video Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-video-views')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">500 Post Shares</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-shares')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Group Members</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-group-members')">₹79 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Facebook Event Responses (500)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-event-responses')">₹149 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Facebook Review Ratings (50)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/facebook-reviews')">₹199 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Twitter Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-twitter"></i> Twitter (X) Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">1,000 Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-followers')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">1,000 Post Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-likes')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">500 Retweets</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-retweets')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">10,000 Video Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-video-views')">₹35 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Twitter Trend Service (1 Hour)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-trend')">₹999 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Twitter Poll Votes (100)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/twitter-poll-votes')">₹59 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Telegram Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-telegram"></i> Telegram Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">2,000 Channel Members</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/telegram-members')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">5,000 Channel Members</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/telegram-members-5000')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">20,000 Post Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/telegram-views')">₹29 Buy</button></li>
+                    <li class="service-item"><span class="service-details">100 Poll Votes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/telegram-poll-votes')">₹35 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Telegram Group Promotion</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/telegram-promotion')">₹199 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Spotify Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-spotify"></i> Spotify Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">1,000 Plays</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/spotify-plays')">₹39 Buy</button></li>
+                    <li class="service-item"><span class="service-details">5,000 Plays</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/spotify-plays-5000')">₹150 Buy</button></li>
+                    <li class="service-item"><span class="service-details">500 Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/spotify-followers')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Spotify Playlist Placement</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/spotify-playlist')">₹299 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TikTok Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fab fa-tiktok"></i> TikTok Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">1,000 TikTok Followers</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/tiktok-followers')">₹49 Buy</button></li>
+                    <li class="service-item"><span class="service-details">10,000 TikTok Likes</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/tiktok-likes')">₹99 Buy</button></li>
+                    <li class="service-item"><span class="service-details">50,000 TikTok Views</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/tiktok-views')">₹79 Buy</button></li>
+                    <li class="service-item"><span class="service-details">TikTok Video Shares (500)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/tiktok-shares')">₹129 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Additional Services -->
+        <div class="service-category">
+            <h3 class="category-title" onclick="toggleCategory(this)"><i class="fas fa-plus-circle"></i> Additional Services <i class="fas fa-chevron-down"></i></h3>
+            <div class="category-content">
+                <ul class="service-list">
+                    <li class="service-item"><span class="service-details">Website Traffic (10,000 Visits)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/website-traffic')">₹199 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Google Reviews (10 Reviews)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/google-reviews')">₹499 Buy</button></li>
+                    <li class="service-item"><span class="service-details">App Store Reviews (10 Reviews)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/app-store-reviews')">₹599 Buy</button></li>
+                    <li class="service-item"><span class="service-details">Email List Building (1,000 Emails)</span><button class="buy-button" onclick="showBuyLink('https://aapkabrand.com/buy/email-list')">₹799 Buy</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Link Page -->
+    <div class="buy-link-page" id="buyLinkPage">
+        <div class="buy-link-container">
+            <h2>Purchase Service</h2>
+            <p>Please visit the following link to complete your purchase:</p>
+            <input type="text" class="buy-link-input" id="buyLinkInput" readonly>
+            <div class="buy-link-buttons">
+                <button class="copy-btn" onclick="copyBuyLink()">Copy Link</button>
+                <button class="close-btn" onclick="closeBuyLink()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chatbot HTML -->
+    <div class="chat-btn" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chat-box" id="chatBox">
+        <div class="chat-header">
+            <span>Support Assistant</span>
+            <span class="chat-close" onclick="toggleChat()">&times;</span>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot">Hello! 👋 मैं आपकी क्या मदद कर सकता हूँ? आप मुझसे price, services, या payment के बारे में पूछ सकते हैं।</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle service categories
+        function toggleCategory(element) {
+            const content = element.nextElementSibling;
+            element.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // Show buy link page
+        function showBuyLink(link) {
+            document.getElementById('buyLinkInput').value = link;
+            document.getElementById('buyLinkPage').style.display = 'flex';
+        }
+
+        // Close buy link page
+        function closeBuyLink() {
+            document.getElementById('buyLinkPage').style.display = 'none';
+        }
+
+        // Copy buy link to clipboard
+        function copyBuyLink() {
+            const copyText = document.getElementById("buyLinkInput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("Link copied to clipboard: " + copyText.value);
+        }
+
+        // --- CHATBOT SCRIPT ---
+
+        // Chatbot ko dikhane ya chhipane ka function
+        function toggleChat() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Yahan aap bot ke jawabon ko badal sakte hain
+        const responses = {
+            "hello": "Hi there! How can I assist you today?",
+            "hi": "Hello! What service are you looking for?",
+            "price": "Our services are very affordable! Instagram followers start at just ₹29 for 1000. For other prices, please check the list on our page.",
+            "rate": "Our services are very affordable! Instagram followers start at just ₹29 for 1000. For other prices, please check the list on our page.",
+            "follower": "Yes, we provide high-quality Instagram followers. The price is ₹29 for 1000 followers. Delivery is instant!",
+            "youtube": "For YouTube, we offer views, subscribers, and watch time. 500 subscribers cost ₹49. What do you need?",
+            "payment": "We accept all major payment methods including UPI, Paytm, and Card. It's 100% secure.",
+            "safe": "Yes, our services are 100% safe and secure. Your account will not be banned.",
+            "real": "We provide high-quality profiles. These are great for boosting your numbers quickly and safely.",
+            "support": "If you need help, you can ask me anything. For order-related issues, please contact our support email.",
+            "bye": "Goodbye! Have a great day!",
+            // Hindi responses
+            "नमस्ते": "नमस्ते! मैं आपकी किस प्रकार सहायता कर सकता हूँ?",
+            "कीमत": "हमारी सेवाएं बहुत सस्ती हैं! Instagram फॉलोअर्स की शुरुआत सिर्फ ₹29 से होती है।",
+            "फॉलोअर": "हाँ, हम उच्च गुणवत्ता वाले Instagram फॉलोअर्स प्रदान करते हैं। 1000 फॉलोअर्स की कीमत ₹29 है।",
+            // Default response
+            "default": "Thanks for your message! Our team will get back to you shortly. Meanwhile, our cheapest plan for 1000 followers is just ₹29."
+        };
+
+        // User ka message bhejne ka function
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const msg = input.value.trim();
+
+            if (!msg) return;
+
+            // User ka message dikhayein
+            const userDiv = document.createElement('div');
+            userDiv.className = 'chat-message user';
+            userDiv.textContent = msg;
+            messagesContainer.appendChild(userDiv);
+
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Bot ka jawab dikhayein
+            showBotResponse(msg);
+        }
+
+        // Bot ka jawab dhoondkar dikhane ka function
+        function showBotResponse(userMessage) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const lowerCaseMsg = userMessage.toLowerCase();
+            let botReply = responses.default;
+
+            // Keyword dhoondhein
+            for (const key in responses) {
+                if (lowerCaseMsg.includes(key)) {
+                    botReply = responses[key];
+                    break;
+                }
+            }
+            
+            // "Typing..." indicator dikhayein
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message bot typing-indicator';
+            typingDiv.textContent = 'Typing...';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 1.2 second baad asli jawab dikhayein
+            setTimeout(() => {
+                messagesContainer.removeChild(typingDiv); // Typing... hata dein
+                
+                const botDiv = document.createElement('div');
+                botDiv.className = 'chat-message bot';
+                botDiv.textContent = botReply;
+                messagesContainer.appendChild(botDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1200);
+        }
+
+        // 'Enter' key dabane par message bhejne ke liye
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Open first category by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstCategory = document.querySelector('.category-title');
+            if (firstCategory) {
+                firstCategory.classList.add('active');
+                firstCategory.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+
+</body>
+</html>
